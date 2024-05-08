@@ -1,126 +1,47 @@
+#include <SFML/Graphics.hpp>
 #include "Grid.hpp"
+using namespace sf;
 
-// Constructors
-Grid::Grid(int n, int w, int h)
+int numCells = 20;
+int width = 700;
+int height = 700;
+
+int main()
 {
-    this->rows = n;
-    this->cols = n;
-    this->w = w;
-    this->h = h;
-    for (int i = 0; i < this->rows; i++)
+    bool play = false;
+    RenderWindow window(VideoMode(width, height), "SFML works!");
+    window.setFramerateLimit(5);
+    Grid grid(numCells, width, height);
+    while (window.isOpen())
     {
-        tablero.push_back({});
-        for (int j = 0; j < this->cols; j++)
+        Event event;
+        while (window.pollEvent(event))
         {
-            tablero[i].push_back(0);
-        }
-    }
-    this->siguiente = vector<vector<int>>(rows, vector<int>(cols, 0));
-}
+            if (event.type == Event::Closed)
+                window.close();
 
-Grid::Grid(int rows, int cols)
-{
-    this->rows = rows;
-    this->cols = cols;
-    for (int i = 0; i < rows; i++)
-    {
-        tablero.push_back({});
-        for (int j = 0; j < cols; j++)
-        {
-            tablero[i].push_back(0);
-        }
-    }
-    this->siguiente = vector<vector<int>>(rows, vector<int>(cols, 0));
-}
-
-// Member Functions
-void Grid::drawTo(RenderWindow &window)
-{
-    int sizeX = this->w / this->cols;
-    int sizeY = this->h / this->rows;
-
-    for (int i = 0; i < this->rows; i++)
-    {
-        for (int j = 0; j < this->cols; j++)
-        {
-            RectangleShape rect(Vector2f(sizeX, sizeY));
-            rect.setPosition(Vector2f(j * sizeX, i * sizeY));
-            rect.setOutlineThickness(1);
-            rect.setOutlineColor(Color::Black);
-            if (tablero[j][i] == 1)
+            if (event.type == Event::MouseButtonPressed)
             {
-                rect.setFillColor(Color::Green);
-            }
-            window.draw(rect);
-        }
-    }
-}
-
-void Grid::toggle(int x, int y)
-{
-    int sizeX = this->w / this->cols;
-    int sizeY = this->h / this->rows;
-
-    int indexX = x / sizeX;
-    int indexY = y / sizeY;
-
-    tablero[indexX][indexY] = (tablero[indexX][indexY] + 1) % 2;
-}
-
-void Grid::update()
-{
-    for (int i = 0; i < this->rows; i++)
-    {
-        for (int j = 0; j < this->cols; j++)
-        {
-            int vecinos = this->calcularVecinos(i, j);
-            if (this->tablero[i][j] == 1)
-            {
-                if (vecinos < 2 || vecinos > 3)
+                if (event.mouseButton.button == Mouse::Left)
                 {
-                    this->siguiente[i][j] = 0;
+                    int x = event.mouseButton.x;
+                    int y = event.mouseButton.y;
+                    grid.toggle(x, y);
                 }
-                else
+                if (event.mouseButton.button == Mouse::Right)
                 {
-                    this->siguiente[i][j] = 1;
+                    play = !play;
                 }
             }
-            else
-            {
-                if (vecinos == 3)
-                {
-                    this->siguiente[i][j] = 1;
-                }
-                else
-                {
-                    this->siguiente[i][j] = 0;
-                }
-            }
+
         }
+
+        window.clear();
+        if (play)
+            grid.update();
+        grid.drawTo(window);
+        window.display();
     }
 
-    this->tablero = this->siguiente;
-}
-
-int Grid::calcularVecinos(int i, int j)
-{
-    int vecinos = 0;
-    if (i > 0 && j > 0 && this->tablero[i - 1][j - 1] == 1)
-        vecinos++;
-    if (j > 0 && this->tablero[i][j - 1] == 1)
-        vecinos++;
-    if (j > 0 && i < this->rows - 1 && this->tablero[i + 1][j - 1] == 1)
-        vecinos++;
-    if (i > 0 && this->tablero[i - 1][j] == 1)
-        vecinos++;
-    if (i < this->rows - 1 && this->tablero[i + 1][j] == 1)
-        vecinos++;
-    if (i > 0 && j < this->cols - 1 && this->tablero[i - 1][j + 1] == 1)
-        vecinos++;
-    if (j < this->cols - 1 && this->tablero[i][j + 1] == 1)
-        vecinos++;
-    if (i < this->rows - 1 && j < this->cols - 1 && this->tablero[i + 1][j + 1] == 1)
-        vecinos++;
-
-    return vecinos;
+    return 0;
 }
