@@ -19,7 +19,7 @@ public:
     void drawTo(RenderWindow  &window);
     void update();
     void toggle(int x,int y);
-    int calcularVecinos(int i, int j);
 };
 
 #endif
+

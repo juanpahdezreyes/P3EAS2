@@ -3,14 +3,13 @@
 using namespace sf;
 
 int numCells = 20;
-int width = 700;
-int height = 700;
+int width = 400;
+int height = 400;
 
 int main()
 {
-    bool play = false;
     RenderWindow window(VideoMode(width, height), "SFML works!");
-    window.setFramerateLimit(5);
+    window.setFramerateLimit(10);
     Grid grid(numCells, width, height);
     while (window.isOpen())
     {
@@ -28,17 +27,12 @@ int main()
                     int y = event.mouseButton.y;
                     grid.toggle(x, y);
                 }
-                if (event.mouseButton.button == Mouse::Right)
-                {
-                    play = !play;
-                }
             }
 
         }
 
         window.clear();
-        if (play)
-            grid.update();
+        grid.update();
         grid.drawTo(window);
         window.display();
     }
